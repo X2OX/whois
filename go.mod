@@ -1,4 +1,4 @@
-module go.x2ox.com/domain
+module go.x2ox.com/whois
 
 go 1.18
 

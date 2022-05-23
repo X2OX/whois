@@ -1,4 +1,4 @@
-package domain
+package whois
 
 import (
 	"io/ioutil"
@@ -6,13 +6,6 @@ import (
 	"sync/atomic"
 	"time"
 )
-
-// async
-
-type QueryResp struct {
-	Data  string
-	Error error
-}
 
 func AsyncQueryWithTimeout(data string, server []string) <-chan string {
 	var (

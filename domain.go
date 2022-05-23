@@ -1,4 +1,4 @@
-package domain
+package whois
 
 import (
 	"fmt"
@@ -37,4 +37,27 @@ func Parse(domain string) (*Domain, error) {
 	return &d, nil
 }
 
-// try to guess
+func (d Domain) Query() string {
+	var (
+		ch  <-chan string
+		has bool
+	)
+
+	for _, v := range whoisServerList {
+		if v.Domain == d.TLD {
+			ch = v.Query(d.eTLD)
+			has = true
+			break
+		}
+	}
+
+	if !has {
+		ch = (Server{Server: []string{
+			"whois.nic." + d.eTLD,
+			"whois." + d.eTLD,
+			"nic." + d.eTLD,
+		}}).Query(d.eTLD)
+	}
+
+	return <-ch
+}
