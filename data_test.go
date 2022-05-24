@@ -7,10 +7,7 @@ import (
 
 func BenchmarkFind(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		s := getRand()
-		if _, ok := whoisServerData[s]; ok {
-			continue
-		}
+		_ = whoisServerData[getRand()]
 	}
 }
 
