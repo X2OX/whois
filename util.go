@@ -45,7 +45,9 @@ func QueryWithTimeout(data, server string, timeout time.Duration) (string, error
 	if err != nil {
 		return "", err
 	}
-	defer connection.Close()
+	defer func() {
+		_ = connection.Close()
+	}()
 
 	if _, err = connection.Write([]byte(data + "\r\n")); err != nil {
 		return "", err
