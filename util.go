@@ -16,19 +16,22 @@ func AsyncQueryWithTimeout(data string, server []string) <-chan string {
 
 	go func() {
 		for i := range server {
-			atomic.AddInt32(&count, 1)
 			serverAddr := server[i]
 
 			go func() {
-				if resp, _ := QueryWithTimeout(data, serverAddr, 10*time.Second); resp != "" {
-					if atomic.CompareAndSwapInt32(&isReturn, 0, 1) {
-						ch <- resp
-					}
+				resp, err := QueryWithTimeout(data, serverAddr, 10*time.Second)
+				if err == nil && resp != "" && atomic.CompareAndSwapInt32(&isReturn, 0, 1) {
+					ch <- resp
 				}
 
-				if atomic.AddInt32(&count, -1); atomic.LoadInt32(&count) == 0 &&
-					atomic.LoadInt32(&isReturn) == 0 {
-					ch <- "error"
+				atomic.AddInt32(&count, -1)
+
+				if atomic.LoadInt32(&count) == 0 && atomic.LoadInt32(&isReturn) == 0 {
+					if err != nil {
+						ch <- err.Error()
+					} else {
+						ch <- "error"
+					}
 				}
 			}()
 		}

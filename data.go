@@ -9,7 +9,7 @@ import (
 var (
 	//go:embed .whois.list .non-icann.whois.list
 	_whoisList      embed.FS
-	whoisServerList = make([]Server, 0, 1100)
+	whoisServerData = make(map[string][]string)
 )
 
 func init() {
@@ -40,10 +40,9 @@ func parseData(filenames ...string) {
 				}
 			}
 
-			whoisServerList = append(whoisServerList, Server{
-				Domain: string(arr[0]),
-				Server: server,
-			})
+			if len(arr) > 0 {
+				whoisServerData[string(arr[0])] = server
+			}
 		}
 		_ = file.Close()
 	}

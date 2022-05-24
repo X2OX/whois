@@ -38,26 +38,10 @@ func Parse(domain string) (*Domain, error) {
 }
 
 func (d Domain) Query() string {
-	var (
-		ch  <-chan string
-		has bool
-	)
-
-	for _, v := range whoisServerList {
-		if v.Domain == d.TLD {
-			ch = v.Query(d.eTLD)
-			has = true
-			break
-		}
+	arr, ok := whoisServerData[d.TLD]
+	if !ok {
+		arr = []string{"whois.nic." + d.TLD, "whois." + d.TLD, "nic." + d.TLD}
 	}
 
-	if !has {
-		ch = (Server{Server: []string{
-			"whois.nic." + d.eTLD,
-			"whois." + d.eTLD,
-			"nic." + d.eTLD,
-		}}).Query(d.eTLD)
-	}
-
-	return <-ch
+	return <-AsyncQueryWithTimeout(d.eTLD, arr)
 }
